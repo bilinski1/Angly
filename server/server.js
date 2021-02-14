@@ -17,7 +17,6 @@ mongoose.connect(
 () => console.log("connected to db")
 );
 
-
 app
     .prepare()
     .then(() => {
