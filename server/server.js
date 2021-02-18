@@ -7,7 +7,9 @@ const handle = app.getRequestHandler()
 const mongoose = require("mongoose");
 const authRoutes = require("../routes/auth");
 const dashboardRoutes = require("../routes/dashboard");
-const verifyToken = require("../routes/validate-token");
+const profileRoutes = require("../routes/profile");
+const verifyToken = require("./validate-token");
+
 
 // connect to db
 mongoose.connect(
@@ -26,12 +28,9 @@ app
   //middlewares
   server.use(express.json()); //body parser
   server.use('/api/user', authRoutes);
-  // this route is protected with token
+  // defining protected routes
   server.use("/api/dashboard", verifyToken, dashboardRoutes);
-  
-  server.get('/api/shows', (req, res) => {
-  return res.end("We made it!");
-    });
+  server.use("/api/profile", verifyToken, profileRoutes)
 
   server.all('*', (req, res) => {
     return handle(req, res)
