@@ -25,4 +25,47 @@ router.get('/me', verifyToken, async (req, res) => {
     }
 });
 
+//@route    POST api/profile/
+//@desc     Create or update a user profile
+//@access   Private
+
+router.post('/', verifyToken, async (req, res) => {
+    const {
+        contactphone,
+        level,
+        coursedetails,
+    } = req.body;
+
+    const profileFields = {};
+    profileFields.user = req.user.id;
+    if (contactphone) profileFields.contactphone = contactphone;
+    if (level) profileFields.level = level;
+    if (coursedetails) profileFields.coursedetails = coursedetails;
+
+
+
+    try {
+        let profile = await Profile.findOne({ user: req.user.id });
+
+        if(profile) {
+            // Update
+            profile = await Profile.findOneAndUpdate(
+                { user: req.user.id },
+                { $set: profileFields },
+                { new: true }
+            ); 
+            return res.json(profile);
+        }
+            // Create
+            profile = new Profile(profileFields);
+            await profile.save();
+            res.json(profile);
+
+    } catch(err) {
+        console.error(err.message);
+        res.status(500).send('Server Error');
+    }
+
+});
+
 module.exports = router; 
